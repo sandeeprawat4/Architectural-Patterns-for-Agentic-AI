@@ -1,99 +1,112 @@
-# Designing a Smart Traffic Management System Using a Dual‑LLM Swarm Architecture
+# Smart Traffic Management System (Dual-LLM Swarm Architecture)
 
-## Introduction
-Smart cities demand intelligent systems capable of interpreting real‑world signals, reasoning over complex situations, and taking action autonomously. Traditional rule‑based traffic systems fail under ambiguity, scale, and real‑time constraints.
+## Overview
+This project demonstrates a **Smart Traffic Management System** built using a **dual LLM swarm architectural pattern**. It leverages **LangGraph** for agent orchestration and **Google Gemini models** for differentiated reasoning tasks.
 
-In this article, we explore how a **dual Large Language Model (LLM) swarm architecture** can be used to create a robust, scalable **Smart Traffic Management System**.
+The system simulates how modern smart cities can process:
+- Unstructured traffic reports
+- On-ground patrol sensor input
+- Traffic violations and penalty enforcement
 
----
-
-## Why Multi‑Agent LLM Systems?
-
-Traffic ecosystems involve multiple roles:
-- Observers (cameras, patrol vehicles)
-- Decision makers (traffic control)
-- Enforcers (penalty & notification systems)
-
-A single monolithic LLM struggles to fulfill all roles efficiently. Multi‑agent architectures solve this by assigning **specialized intelligence per task**.
+using **multiple cooperating AI agents**.
 
 ---
 
-## Dual‑LLM Swarm Pattern Explained
+## Architecture: Dual LLM Swarm Pattern
 
-This system uses **two collaborating LLM agents**:
+The system uses **two specialized LLMs**:
 
-### 1. Observer Agent (Gemini 2.5 Flash)
-- Fast
-- Cost‑efficient
-- Optimized for unstructured data extraction
+| Agent Role | Model | Responsibility |
+|----------|------|----------------|
+| Observer Agent | Gemini 2.5 Flash | Fast extraction from unstructured text & sensor data |
+| Penalty/Manager Agent | Gemini 2.5 Pro | Higher-reasoning tasks such as violation assessment, severity and enforcement |
 
-Processes:
-- Text reports
-- Sensor descriptions
-- Patrol camera observations
-
-### 2. Reasoning & Compliance Agent (Gemini 2.5 Pro)
-- Higher reasoning capability
-- Contextual decision making
-
-Handles:
-- Violation classification
-- Severity assessment
-- Enforcement decisions
+All agents communicate through a **shared state graph** implemented using LangGraph.
 
 ---
 
-## LangGraph: The Orchestration Backbone
-
-LangGraph enables deterministic agent workflows through **state graphs**.
+## Project Structure
 
 ```text
-Input → Observer → Manager → Penalty → End
+traffic_management_system.py   # Main multi-agent orchestration code
+README.md                      # Project documentation
 ```
-
-Each node receives the same evolving state, allowing agents to cooperate rather than compete.
 
 ---
 
-## Unified State Design
+## Key Components
 
-A shared typed state ensures consistency across agents:
+### 1. TrafficSystemState
+A strongly-typed shared state that flows through the agent graph.
 
 ```python
-penalty_status
-management_action
-notifications_sent
-refined_data
+class TrafficSystemState(TypedDict):
+    unstructured_input: str
+    raw_sensor_data: Dict
+    refined_data: Dict
+    penalty_status: str
+    notifications_sent: List[str]
+    management_action: str
+    on_ground_image_ref: str
 ```
 
-This design avoids brittle hand‑offs and enables auditability.
+---
+
+### 2. Agent Nodes
+
+- **Input Processor Node**
+  - Normalizes text and sensor inputs
+- **Management Orchestrator Node**
+  - Decides operational response (warnings, towing, monitoring)
+- **Penalty Compliance Node**
+  - Issues penalties and sends notifications
 
 ---
 
-## Example Scenarios
+### 3. LangGraph Orchestration
 
-✅ Illegal parking detected via patrol vehicle
-✅ Speeding via unstructured citizen report
-✅ High congestion narrative analysis
+```text
+processor -> manager -> penalty -> END
+```
 
-All scenarios flow through the **same agent graph**.
-
----
-
-## Benefits Over Traditional Systems
-
-- 🧠 Context‑aware decisions
-- 🔁 Reusable agent workflows
-- 💰 Optimized LLM costs
-- 📈 Easy scalability
+A single unified graph handles *both* patrol sensor data and citizen reports.
 
 ---
 
-## Final Thoughts
+## Simulated Scenarios
 
-The dual‑LLM swarm architecture represents a powerful design pattern for real‑world AI systems. By separating perception and reasoning and orchestrating them via LangGraph, we unlock new levels of reliability and intelligence for smart cities.
+- Illegal parking detection
+- Median bypass violations
+- High congestion narrative reports
+- Smart patrol vehicle sightings
 
-This approach extends beyond traffic:
-Healthcare, cybersecurity, logistics, and finance can all benefit.
+---
+
+## How to Run
+
+```bash
+pip install langchain-google-genai langgraph pandas
+python traffic_management_system.py
+```
+
+Ensure your Google Gemini API key is set via environment variables.
+
+---
+
+## Why Dual LLM Swarm?
+
+✅ Separation of concerns
+✅ Cost-efficient inference
+✅ Better reasoning accuracy
+✅ Scalable city-wide deployments
+
+---
+
+## Future Enhancements
+
+- Real-time camera feeds
+- Computer vision integration
+- Dynamic traffic light control
+- Reinforcement learning for congestion optimization
 
 ---
